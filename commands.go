@@ -24,21 +24,17 @@ func commandHelp(cnf *config) error {
 func commandMap(cnf *config) error {
 	url := ""
 	if cnf.Next == "" {
-		url = "https://pokeapi.co/api/v2/location-area/"
+		url = "https://pokeapi.co/api/v2/location-area/?offset=0&limit=20"
 	} else {
 		url = cnf.Next
 	}
-	locations := getLocationAreas(url)
+	locations, err := cnf.getLocationAreas(url)
+	if err != nil {
+		return err
+	}
 	for _, area := range locations.Results {
 		fmt.Println(area.Name)
 	}
-	if locations.Previous != nil {
-		cnf.Previous = *locations.Previous
-	}
-	if locations.Next != nil {
-		cnf.Next = *locations.Next
-	}
-
 	return nil
 }
 
@@ -48,18 +44,12 @@ func commandMapB(cnf *config) error {
 		fmt.Println("you're on the first page")
 		return nil
 	}
-	locations := getLocationAreas(url)
+	locations, err := cnf.getLocationAreas(url)
+	if err != nil {
+		return err
+	}
 	for _, area := range locations.Results {
 		fmt.Println(area.Name)
-	}
-
-	if locations.Previous != nil {
-		cnf.Previous = *locations.Previous
-	} else {
-		cnf.Previous = ""
-	}
-	if locations.Next != nil {
-		cnf.Next = *locations.Next
 	}
 	return nil
 }

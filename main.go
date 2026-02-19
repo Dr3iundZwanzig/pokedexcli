@@ -1,5 +1,16 @@
 package main
 
+import (
+	"time"
+
+	"github.com/Dr3iundZwanzig/pokedexcli/internal/pokecache"
+)
+
 func main() {
-	repl()
+	cnf := config{
+		Next:     "",
+		Previous: "",
+		Cache:    pokecache.NewCache(time.Minute * 5),
+	}
+	repl(&cnf)
 }

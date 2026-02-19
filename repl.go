@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/Dr3iundZwanzig/pokedexcli/internal/pokecache"
 )
 
-func repl() {
+func repl(cnf *config) {
 	scanner := bufio.NewScanner(os.Stdin)
-	cnf := config{
-		Next:     "",
-		Previous: "",
-	}
+
 	for {
 		fmt.Print("Pokedex > ")
 
@@ -26,7 +25,7 @@ func repl() {
 		}
 		command, ok := getCommands()[commanName]
 		if ok {
-			err := command.callback(&cnf)
+			err := command.callback(cnf)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -52,6 +51,7 @@ type cliCommand struct {
 type config struct {
 	Next     string
 	Previous string
+	Cache    pokecache.Cache
 }
 
 func getCommands() map[string]cliCommand {
