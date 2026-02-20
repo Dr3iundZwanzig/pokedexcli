@@ -18,7 +18,7 @@ type cacheEntry struct {
 
 func NewCache(interval time.Duration) Cache {
 	c := Cache{
-		entryMap: make(map[string]cacheEntry),
+		entryMap: map[string]cacheEntry{},
 		mu:       &sync.Mutex{},
 	}
 

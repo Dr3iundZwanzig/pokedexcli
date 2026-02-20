@@ -17,15 +17,25 @@ func repl(cnf *config) {
 
 		scanner.Scan()
 		userInput := scanner.Text()
+		cleanUserInput := cleanInput(userInput)
 
-		commanName := cleanInput(userInput)[0]
+		commanName := cleanUserInput[0]
+		secondInput := ""
 		if len(userInput) == 0 {
 			fmt.Print("Empty input\n")
 			continue
 		}
+		if len(cleanUserInput) == 2 {
+			secondInput = cleanUserInput[1]
+		}
+		if len(cleanUserInput) > 2 {
+			fmt.Println("Too many inputs")
+			continue
+		}
+
 		command, ok := getCommands()[commanName]
 		if ok {
-			err := command.callback(cnf)
+			err := command.callback(cnf, secondInput)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -45,7 +55,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, string) error
 }
 
 type config struct {
@@ -75,6 +85,11 @@ func getCommands() map[string]cliCommand {
 			name:        "mapb",
 			description: "Displays the previous locations",
 			callback:    commandMapB,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Explore the specified location",
+			callback:    commandExplore,
 		},
 	}
 }
