@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand/v2"
 	"os"
 )
 
@@ -63,7 +64,7 @@ func commandExplore(cnf *config, si string) error {
 	}
 	locationArea, err := cnf.getLocationArea(si)
 	if err != nil {
-		return fmt.Errorf("Area not found")
+		return fmt.Errorf("Area not found: %v", si)
 	}
 	fmt.Printf("Exploring %v\n", locationArea.Name)
 	if len(locationArea.PokemonEncounters) == 0 {
@@ -73,6 +74,62 @@ func commandExplore(cnf *config, si string) error {
 	fmt.Println("Found Pokemon:")
 	for _, pokemon := range locationArea.PokemonEncounters {
 		fmt.Printf("- %v\n", pokemon.Pokemon.Name)
+	}
+	return nil
+}
+
+func commandCatch(cnf *config, si string) error {
+	if si == "" {
+		return fmt.Errorf("Second input empty")
+	}
+
+	pokemon, err := cnf.getPokemon(si)
+	if err != nil {
+		return fmt.Errorf("Pokemon not found: %v", si)
+	}
+	fmt.Printf("Throwing a Pokeball at %v...\n", pokemon.Name)
+	catchChance := 60 + pokemon.BaseExperience
+	if rand.IntN(catchChance) > pokemon.BaseExperience {
+		fmt.Printf("%v was caught!\n", pokemon.Name)
+		cnf.Pokedex[pokemon.Name] = pokemon
+	} else {
+		fmt.Printf("%v escaped!\n", pokemon.Name)
+	}
+	return nil
+}
+
+func commandInspect(cnf *config, si string) error {
+	if si == "" {
+		return fmt.Errorf("Second input empty")
+	}
+
+	pokemon, ok := cnf.Pokedex[si]
+	if !ok {
+		return fmt.Errorf("you have not caught that pokemon")
+	}
+	fmt.Printf("Name: %v\n", pokemon.Name)
+	fmt.Printf("Height: %v\n", pokemon.Height)
+	fmt.Printf("Weight: %v\n", pokemon.Weight)
+	fmt.Printf("Stats:\n")
+	for _, stat := range pokemon.Stats {
+		fmt.Printf("  -%v: %v\n", stat.Stat.Name, stat.BaseStat)
+	}
+	fmt.Println("Types:")
+	for _, Types := range pokemon.Types {
+		fmt.Printf("  - %v\n", Types.Type.Name)
+	}
+
+	return nil
+}
+
+func commandPokedex(cnf *config, si string) error {
+	if len(cnf.Pokedex) == 0 {
+		return fmt.Errorf("Your Pokedex is empty")
+	}
+
+	fmt.Println("Your Pokedex:")
+	for _, poke := range cnf.Pokedex {
+		fmt.Printf(" - %v\n", poke.Name)
 	}
 	return nil
 }
