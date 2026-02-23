@@ -11,6 +11,7 @@ func main() {
 		Next:     "",
 		Previous: "",
 		Cache:    pokecache.NewCache(time.Minute * 5),
+		Pokedex:  map[string]Pokemon{},
 	}
 	repl(&cnf)
 }
